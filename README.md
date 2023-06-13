@@ -27,7 +27,7 @@ Terceiro trabalho da disciplina de Construção de Compiladores, lecionada pelo 
 
 ## Compilação e Execução
 
-Os requisitos para compilação são o **Java 20** e a ferramenta de gerenciamento de pacotes **Maven**.
+Os requisitos para compilação são o **Java 11** e a ferramenta de gerenciamento de pacotes **Maven**.
 
 Para compilar e executar o programa basta executar os comandos a seguir, a partir da pasta `t3-semantico`.
 
