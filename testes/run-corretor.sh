@@ -1,7 +1,7 @@
 #!/bin/bash
 
 corretor=$PWD/testes/corretor-automatico.jar
-executavel=$PWD/t3-parser/target/t3-parser-1.0-SNAPSHOT-jar-with-dependencies.jar
+executavel=$PWD/t3-semantico/target/t3-semantico-1.0-SNAPSHOT-jar-with-dependencies.jar
 pastaTemp=$PWD/temp
 casosTeste=$PWD/testes/casos-de-teste
 ras="790716, 791964, 790035"
