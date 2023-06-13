@@ -2,7 +2,7 @@ package br.ufscar.dc.compiladores;
 
 import br.ufscar.dc.compiladores.ExemploTabelaDeSimbolos.TipoLA;
 
-public class LASemantico extends LABaseVisitor<Void> {
+public class ExemploLASemantico extends LABaseVisitor<Void> {
 
     ExemploTabelaDeSimbolos tabela;
 

@@ -16,48 +16,48 @@ public class LASemanticoUtils {
         errosSemanticos.add(String.format("Erro %d:%d - %s", linha, coluna, mensagem));
     }
     
-    public static TabelaDeSimbolos.TipoLA verificarTipo(TabelaDeSimbolos tabela, LAParser.ExpressaoAritmeticaContext ctx) {
-        TabelaDeSimbolos.TipoLA ret = null;
+    public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, LAParser.ExpressaoAritmeticaContext ctx) {
+        ExemploTabelaDeSimbolos.TipoLA ret = null;
         for (TermoAritmeticoContext ta : ctx.termoAritmetico()) {
-            TabelaDeSimbolos.TipoLA aux = verificarTipo(tabela, ta);
+            ExemploTabelaDeSimbolos.TipoLA aux = verificarTipo(tabela, ta);
             if (ret == null) {
                 ret = aux;
-            } else if (ret != aux && aux != TabelaDeSimbolos.TipoLA.INVALIDO) {
+            } else if (ret != aux && aux != ExemploTabelaDeSimbolos.TipoLA.INVALIDO) {
                 adicionarErroSemantico(ctx.start, "Expressão " + ctx.getText() + " contém tipos incompatíveis");
-                ret = TabelaDeSimbolos.TipoLA.INVALIDO;
+                ret = ExemploTabelaDeSimbolos.TipoLA.INVALIDO;
             }
         }
 
         return ret;
     }
 
-    public static TabelaDeSimbolos.TipoLA verificarTipo(TabelaDeSimbolos tabela, LAParser.TermoAritmeticoContext ctx) {
-        TabelaDeSimbolos.TipoLA ret = null;
+    public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, LAParser.TermoAritmeticoContext ctx) {
+        ExemploTabelaDeSimbolos.TipoLA ret = null;
 
         for (FatorAritmeticoContext fa : ctx.fatorAritmetico()) {
-            TabelaDeSimbolos.TipoLA aux = verificarTipo(tabela, fa);
+            ExemploTabelaDeSimbolos.TipoLA aux = verificarTipo(tabela, fa);
             if (ret == null) {
                 ret = aux;
-            } else if (ret != aux && aux != TabelaDeSimbolos.TipoLA.INVALIDO) {
+            } else if (ret != aux && aux != ExemploTabelaDeSimbolos.TipoLA.INVALIDO) {
                 adicionarErroSemantico(ctx.start, "Termo " + ctx.getText() + " contém tipos incompatíveis");
-                ret = TabelaDeSimbolos.TipoLA.INVALIDO;
+                ret = ExemploTabelaDeSimbolos.TipoLA.INVALIDO;
             }
         }
         return ret;
     }
 
-    public static TabelaDeSimbolos.TipoLA verificarTipo(TabelaDeSimbolos tabela, LAParser.FatorAritmeticoContext ctx) {
+    public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, LAParser.FatorAritmeticoContext ctx) {
         if (ctx.NUMINT() != null) {
-            return TabelaDeSimbolos.TipoLA.INTEIRO;
+            return ExemploTabelaDeSimbolos.TipoLA.INTEIRO;
         }
         if (ctx.NUMREAL() != null) {
-            return TabelaDeSimbolos.TipoLA.REAL;
+            return ExemploTabelaDeSimbolos.TipoLA.REAL;
         }
         if (ctx.VARIAVEL() != null) {
             String nomeVar = ctx.VARIAVEL().getText();
             if (!tabela.existe(nomeVar)) {
                 adicionarErroSemantico(ctx.VARIAVEL().getSymbol(), "Variável " + nomeVar + " não foi declarada antes do uso");
-                return TabelaDeSimbolos.TipoLA.INVALIDO;
+                return ExemploTabelaDeSimbolos.TipoLA.INVALIDO;
             }
             return verificarTipo(tabela, nomeVar);
         }
@@ -66,7 +66,7 @@ public class LASemanticoUtils {
         return verificarTipo(tabela, ctx.expressaoAritmetica());
     }
     
-    public static TabelaDeSimbolos.TipoLA verificarTipo(TabelaDeSimbolos tabela, String nomeVar) {
+    public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, String nomeVar) {
         return tabela.verificar(nomeVar);
     }    
 }
