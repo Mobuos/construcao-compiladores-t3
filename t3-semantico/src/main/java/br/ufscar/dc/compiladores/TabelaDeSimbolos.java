@@ -7,6 +7,10 @@ public class TabelaDeSimbolos {
     public enum TipoLA {
         INTEIRO,
         REAL,
+        LITERAL,
+        LOGICO,
+        REGISTRO,
+        PONTEIRO,
         INVALIDO
     }
     

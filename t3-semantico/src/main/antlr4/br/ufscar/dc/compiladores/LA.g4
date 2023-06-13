@@ -1,4 +1,4 @@
-grammar T2;
+grammar LA;
 
 // Parte Léxica (T1)
 // -----------------
