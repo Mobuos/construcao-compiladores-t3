@@ -117,11 +117,11 @@ programa
 
 // Regra de definição dos diferentes tipos de declarações de variáveis e funções.
 declaracoes
-    : (declaracao_local | declaracao_global)*
+    : (declaracao_variaveis | declaracao_funcoes)*
     ;
 
 // Regra de declaração de variáveis.
-declaracao_local
+declaracao_variaveis
     : 'declare' variavel 
     | 'constante' IDENT ':' tipo_basico '=' valor_constante 
     | 'tipo' IDENT ':' tipo
@@ -132,35 +132,26 @@ variavel
 
 // Regra de declaração de um vetor.
 identificador
-    : IDENT ('.' IDENT)* dimensao
-    ;
-
-// Regra para declaração da dimensão do vetor.
-dimensao
-    : ('[' exp_aritmetica ']')*
+    : IDENT ('.' IDENT)* ('[' exp_aritmetica ']')*
     ;
 
 // Regra de declaração de variáveis "complexas", como "estruturas" e "ponteiros".
 tipo
     : registro 
-    | tipo_estendido
+    | tipo_variavel
     ;
 
 // Regra de declaração dos tipos básicos de variáveis.
 tipo_basico
-    : 'literal' 
-    | 'inteiro' 
-    | 'real' 
-    | 'logico'
-    ;
-tipo_basico_ident
-    : tipo_basico 
-    | IDENT
+    : LITERAL
+    | INTEIRO 
+    | REAL 
+    | LOGICO
     ;
 
 // Regra de declaração de um ponteiro.
-tipo_estendido
-    : '^'? tipo_basico_ident
+tipo_variavel
+    : '^'? (tipo_basico | IDENT)
     ;
 
 // Regra de declaração de valores constantes.
@@ -168,8 +159,8 @@ valor_constante
     : CADEIA 
     | NUM_INT 
     | NUM_REAL 
-    | 'verdadeiro' 
-    | 'falso'
+    | TRUE 
+    | FALSE
     ;    
 
 // Regra de declaração de "estrutura de dados".
@@ -179,7 +170,7 @@ registro
 
 // Regra de declaração de parâmetros de uma função.
 parametro
-    : 'var'? identificador (',' identificador)* ':' tipo_estendido
+    : 'var'? identificador (',' identificador)* ':' tipo_variavel
     ;
 
 parametros
@@ -187,14 +178,14 @@ parametros
     ;
 
 // Regra de declaração de funções e procedimentos.
-declaracao_global
-    : 'procedimento' IDENT '(' parametros? ')' declaracao_local* cmd* 'fim_procedimento' 
-    | 'funcao' IDENT '(' parametros? ')' ':' tipo_estendido declaracao_local* cmd* 'fim_funcao'
+declaracao_funcoes
+    : 'procedimento' IDENT '(' parametros? ')' declaracao_variaveis* cmd* 'fim_procedimento' 
+    | 'funcao' IDENT '(' parametros? ')' ':' tipo_variavel declaracao_variaveis* cmd* 'fim_funcao'
     ;
 
 // Regra de definição do corpo de uma função ou procedimento.
 corpo
-    : declaracao_local* cmd*
+    : declaracao_variaveis* cmd*
     ;
 
 // Regras de definições de comandos da linguagem.
