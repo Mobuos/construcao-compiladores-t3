@@ -117,11 +117,7 @@ programa
 
 // Regra de definição dos diferentes tipos de declarações de variáveis e funções.
 declaracoes
-    : decl_local_global*
-    ;
-decl_local_global
-    : declaracao_local 
-    | declaracao_global
+    : (declaracao_local | declaracao_global)*
     ;
 
 // Regra de declaração de variáveis.
