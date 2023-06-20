@@ -97,9 +97,12 @@ public class Principal
         lexer = new LALexer(cs);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LAParser parser = new LAParser(tokens);
+
         parser.removeErrorListeners();
+        
         ProgramaContext arvore = parser.programa();
         LASemantico as = new LASemantico();
+
         as.visitPrograma(arvore);
         LASemanticoUtils.errosSemanticos.forEach((s) -> writer.println(s));
         

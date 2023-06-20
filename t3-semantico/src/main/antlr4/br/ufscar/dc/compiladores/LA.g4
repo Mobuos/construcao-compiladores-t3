@@ -124,7 +124,7 @@ declaracoes
 declaracao_variaveis
     : 'declare' variavel 
     | 'constante' IDENT ':' tipo_basico '=' valor_constante 
-    | 'tipo' IDENT ':' tipo
+    | 'tipo' IDENT ':' registro
     ;
 variavel
     : identificador (',' identificador)* ':' tipo

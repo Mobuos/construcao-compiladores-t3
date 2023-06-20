@@ -1,74 +1,96 @@
 package br.ufscar.dc.compiladores;
 
-import br.ufscar.dc.compiladores.TabelaDeSimbolos.TipoLA;
+import java.util.LinkedList;
+
+import br.ufscar.dc.compiladores.LAParser.Declaracao_funcoesContext;
+import br.ufscar.dc.compiladores.LAParser.Declaracao_variaveisContext;
+import br.ufscar.dc.compiladores.LAParser.DeclaracoesContext;
+import br.ufscar.dc.compiladores.LAParser.IdentificadorContext;
 
 public class LASemantico extends LABaseVisitor<Void> {
 
-    TabelaDeSimbolos tabela;
+    Escopo escopo = new Escopo();
 
     @Override
-    public Void visitPrograma(LAParser.ProgramaContext ctx) {
-        tabela = new TabelaDeSimbolos();
-        return super.visitPrograma(ctx);
+    public Void visitDeclaracoes
+    (
+        DeclaracoesContext ctx
+    ) 
+    {
+        escopo.criarNovoEscopo();
+        return super.visitDeclaracoes(ctx);
     }
 
-    // @Override
-    // public Void visitDeclaracao(LAParser.DeclaracaoContext ctx) {
-    //     String nomeVar = ctx.VARIAVEL().getText();
-    //     String strTipoVar = ctx.TIPO_VAR().getText();
-    //     TipoLA tipoVar = TipoLA.INVALIDO;
-    //     switch (strTipoVar) {
-    //         case "INTEIRO":
-    //             tipoVar = TipoLA.INTEIRO;
-    //             break;
-    //         case "REAL":
-    //             tipoVar = TipoLA.REAL;
-    //             break;
-    //         default:
-    //             // Nunca irá acontecer, pois o analisador sintático
-    //             // não permite
-    //             break;
-    //     }
+    @Override
+    public Void visitDeclaracao_funcoes
+    (
+        Declaracao_funcoesContext ctx
+    )
+    {
+        TabelaDeSimbolos tabelaAtual = escopo.escopoAtual();
 
-    //     // Verificar se a variável já foi declarada
-    //     if (tabela.existe(nomeVar)) {
-    //         LASemanticoUtils.adicionarErroSemantico(ctx.VARIAVEL().getSymbol(), "Variável " + nomeVar + " já existe");
-    //     } else {
-    //         tabela.adicionar(nomeVar, tipoVar);
-    //     }
+        if (ctx.PROCEDIMENTO() != null){
+            String nome = ctx.PROCEDIMENTO().getText();
 
-    //     return super.visitDeclaracao(ctx);
-    // }
+            // TODO: Colocar erro semântico caso o nome do procedimento já exista.
+            if (tabelaAtual.existe(nome)){
+                
+            }
+        }
+        else if (ctx.FUNCAO() != null){
+            String nome = ctx.FUNCAO().getText();
+            
+            // TODO: Colocar erro semântico caso o nome do procedimento já exista.
+            if (tabelaAtual.existe(nome)){
+            }
+        }
 
-    // @Override
-    // public Void visitComandoAtribuicao(LAParser.ComandoAtribuicaoContext ctx) {
-    //     TipoLA tipoExpressao = LASemanticoUtils.verificarTipo(tabela, ctx.expressaoAritmetica());
-    //     if (tipoExpressao != TipoLA.INVALIDO) {
-    //         String nomeVar = ctx.VARIAVEL().getText();
-    //         if (!tabela.existe(nomeVar)) {
-    //             LASemanticoUtils.adicionarErroSemantico(ctx.VARIAVEL().getSymbol(), "Variável " + nomeVar + " não foi declarada antes do uso");
-    //         } else {
-    //             TipoLA tipoVariavel = LASemanticoUtils.verificarTipo(tabela, nomeVar);
-    //             if (tipoVariavel != tipoExpressao) {
-    //                 LASemanticoUtils.adicionarErroSemantico(ctx.VARIAVEL().getSymbol(), "Tipo da variável " + nomeVar + " não é compatível com o tipo da expressão");
-    //             }
-    //         }
-    //     }
-    //     return super.visitComandoAtribuicao(ctx);
-    // }
+        return super.visitDeclaracao_funcoes(ctx);
+    }
 
-    // @Override
-    // public Void visitComandoEntrada(LAParser.ComandoEntradaContext ctx) {
-    //     String nomeVar = ctx.VARIAVEL().getText();
-    //     if (!tabela.existe(nomeVar)) {
-    //         LASemanticoUtils.adicionarErroSemantico(ctx.VARIAVEL().getSymbol(), "Variável " + nomeVar + " não foi declarada antes do uso");
-    //     }
-    //     return super.visitComandoEntrada(ctx);
-    // }
+    @Override
+    public Void visitDeclaracao_variaveis
+    (
+        Declaracao_variaveisContext ctx
+    )
+    {
+        TabelaDeSimbolos tabela = escopo.escopoAtual();
 
-    // @Override
-    // public Void visitExpressaoAritmetica(LAParser.ExpressaoAritmeticaContext ctx) {
-    //     LASemanticoUtils.verificarTipo(tabela, ctx);
-    //     return super.visitExpressaoAritmetica(ctx);
-    // }
+        if (ctx.DECLARE() != null){
+            String nome = ctx.DECLARE().getText();
+
+            // TODO: Colocar erro que já exista a variável.
+            if (tabela.existe(nome)){
+                System.out.println("Variavel " + nome + "ja esta declarada");
+            }
+            else{
+                LASemanticoUtils.verificarTipo(tabela, ctx.variavel());
+            }
+        }
+        return super.visitDeclaracao_variaveis(ctx);
+    }
+
+    @Override
+    public Void visitIdentificador
+    (
+        IdentificadorContext ctx
+    ) 
+    {
+        LinkedList<TabelaDeSimbolos> tabelas = escopo.recuperarTodosEscopos();
+        String nome = ctx.IDENT().get(0).getText();
+        boolean existeVariavel = false;
+
+        for ( TabelaDeSimbolos tabela: tabelas){
+            if (tabela.existe(nome)){
+                existeVariavel = true;
+                break;
+            }
+        }
+
+        if (!existeVariavel){
+            LASemanticoUtils.adicionarErroSemantico(ctx.start, "identificador " + nome + " nao declarado" );
+        }
+
+        return super.visitIdentificador(ctx);
+    }
 }

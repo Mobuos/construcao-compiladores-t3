@@ -2,73 +2,120 @@ package br.ufscar.dc.compiladores;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.antlr.v4.runtime.Token;
 
-// TODO: Remover
-// import br.ufscar.dc.compiladores.LAParser.FatorAritmeticoContext;
-// import br.ufscar.dc.compiladores.LAParser.TermoAritmeticoContext;
-
+import br.ufscar.dc.compiladores.LAParser.TipoContext;
+import br.ufscar.dc.compiladores. LAParser.Tipo_basicoContext;
+import br.ufscar.dc.compiladores.LAParser.Tipo_variavelContext;
+import br.ufscar.dc.compiladores.LAParser.VariavelContext;
+import br.ufscar.dc.compiladores.TabelaDeSimbolos.TipoDeclaracao;
 public class LASemanticoUtils {
     public static List<String> errosSemanticos = new ArrayList<>();
     
-    public static void adicionarErroSemantico(Token t, String mensagem) {
+    public static void adicionarErroSemantico
+    (
+        Token t,
+        String mensagem
+    ) 
+    {
         int linha = t.getLine();
-        int coluna = t.getCharPositionInLine();
-        errosSemanticos.add(String.format("Erro %d:%d - %s", linha, coluna, mensagem));
+        errosSemanticos.add(String.format("Linha %d: %s", linha, mensagem));
     }
-    
-    // TODO: Remover, exemplo solament para referencia minha dini joao dini eu
-    // public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, LAParser.ExpressaoAritmeticaContext ctx) {
-    //     ExemploTabelaDeSimbolos.TipoLA ret = null;
-    //     for (TermoAritmeticoContext ta : ctx.termoAritmetico()) {
-    //         ExemploTabelaDeSimbolos.TipoLA aux = verificarTipo(tabela, ta);
-    //         if (ret == null) {
-    //             ret = aux;
-    //         } else if (ret != aux && aux != ExemploTabelaDeSimbolos.TipoLA.INVALIDO) {
-    //             adicionarErroSemantico(ctx.start, "Expressão " + ctx.getText() + " contém tipos incompatíveis");
-    //             ret = ExemploTabelaDeSimbolos.TipoLA.INVALIDO;
-    //         }
-    //     }
 
-    //     return ret;
-    // }
+    public static TipoDeclaracao verificarTipo
+    (
+        TabelaDeSimbolos tabela,
+        Tipo_basicoContext ctx)
+    {
+        if (ctx.LITERAL() != null){
+            return TipoDeclaracao.LITERAL;
+        }
+        else if (ctx.INTEIRO() != null){
+            return TipoDeclaracao.INTEIRO;
+        }
+        else if (ctx.LOGICO() != null){
+            return TipoDeclaracao.LOGICO;
+        }
+        else if (ctx.REAL() != null){
+            return TipoDeclaracao.REAL;
+        }
+        else {
+            return TipoDeclaracao.INVALIDO;
+        }
+    }
 
-    // public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, LAParser.TermoAritmeticoContext ctx) {
-    //     ExemploTabelaDeSimbolos.TipoLA ret = null;
+    public static TipoDeclaracao verificarTipo
+    (
+        TabelaDeSimbolos tabela,
+        Tipo_variavelContext ctx
+    )
+    {
+        TipoDeclaracao tipo;
 
-    //     for (FatorAritmeticoContext fa : ctx.fatorAritmetico()) {
-    //         ExemploTabelaDeSimbolos.TipoLA aux = verificarTipo(tabela, fa);
-    //         if (ret == null) {
-    //             ret = aux;
-    //         } else if (ret != aux && aux != ExemploTabelaDeSimbolos.TipoLA.INVALIDO) {
-    //             adicionarErroSemantico(ctx.start, "Termo " + ctx.getText() + " contém tipos incompatíveis");
-    //             ret = ExemploTabelaDeSimbolos.TipoLA.INVALIDO;
-    //         }
-    //     }
-    //     return ret;
-    // }
+        // Caso haja o simbolo de ponteiro antes é declarado como ponteiro.
+        if (ctx.PONTEIRO() != null){
+            return TipoDeclaracao.PONTEIRO;
+        }
 
-    // public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, LAParser.FatorAritmeticoContext ctx) {
-    //     if (ctx.NUMINT() != null) {
-    //         return ExemploTabelaDeSimbolos.TipoLA.INTEIRO;
-    //     }
-    //     if (ctx.NUMREAL() != null) {
-    //         return ExemploTabelaDeSimbolos.TipoLA.REAL;
-    //     }
-    //     if (ctx.VARIAVEL() != null) {
-    //         String nomeVar = ctx.VARIAVEL().getText();
-    //         if (!tabela.existe(nomeVar)) {
-    //             adicionarErroSemantico(ctx.VARIAVEL().getSymbol(), "Variável " + nomeVar + " não foi declarada antes do uso");
-    //             return ExemploTabelaDeSimbolos.TipoLA.INVALIDO;
-    //         }
-    //         return verificarTipo(tabela, nomeVar);
-    //     }
-    //     // se não for nenhum dos tipos acima, só pode ser uma expressão
-    //     // entre parêntesis
-    //     return verificarTipo(tabela, ctx.expressaoAritmetica());
-    // }
-    
-    // public static ExemploTabelaDeSimbolos.TipoLA verificarTipo(ExemploTabelaDeSimbolos tabela, String nomeVar) {
-    //     return tabela.verificar(nomeVar);
-    // }    
+        // Caso seja um identificador, é um registro,
+        // então é necessário ver se o tipo de registro existe.
+        else if (ctx.IDENT() != null) {
+            if (!tabela.existe(ctx.IDENT().getText())){
+                return TipoDeclaracao.INVALIDO;
+            }
+            else{
+                tipo = TipoDeclaracao.REGISTRO;
+            }
+        }
+        
+        // É uma variável de tipo básico.
+        else {
+            tipo = verificarTipo(tabela, ctx.tipo_basico());
+        }
+
+        
+        return tipo;
+    }
+
+    public static TipoDeclaracao verificarTipo
+    (
+        TabelaDeSimbolos tabela,
+        TipoContext ctx
+    )
+    {
+        // if (ctx.tipo_variavel() != null){
+            return verificarTipo(tabela, ctx.tipo_variavel());
+        // }
+        // else{
+        //     return verificarTipo(tabela, ctx.registro());
+        // }
+    }
+
+    public static TipoDeclaracao verificarTipo
+    (
+        TabelaDeSimbolos tabela,
+        VariavelContext ctx
+    )
+    {
+        TipoDeclaracao tipo = verificarTipo(tabela, ctx.tipo());
+
+        ctx.identificador().forEach(ident -> {
+            if (tabela.existe(ident.getText())){
+                adicionarErroSemantico(
+                    ctx.tipo().start,
+                    "identificador " + ident.getText() + " ja declarado anteriormente"
+                    );
+            }
+            else{
+                tabela.adicionar(ident.getText(), tipo);
+            }
+        });
+
+        if (tipo == TipoDeclaracao.INVALIDO){
+            adicionarErroSemantico(ctx.tipo().start, "tipo " + ctx.tipo().getText() + " nao declarado" );
+        }
+
+        return tipo;
+    }
 }
