@@ -36,6 +36,7 @@ public class LASemanticoUtils {
         errosSemanticos.add(String.format("Linha %d: %s", linha, mensagem));
     }
 
+    // Verifica tipo básico.
     public static TipoDeclaracao verificarTipo
     (
         Tipo_basicoContext ctx)
@@ -57,6 +58,7 @@ public class LASemanticoUtils {
         }
     }
 
+    // Função de verificação do tipo de variável.
     public static TipoDeclaracao verificarTipo
     (
         Escopo escopo,
@@ -92,6 +94,8 @@ public class LASemanticoUtils {
         return tipo;
     }
 
+    // Função auxiliar para o contexto "Tipo"
+    // chamando a verificação do tipo de variável.
     public static TipoDeclaracao verificarTipo
     (
         Escopo escopo,
@@ -101,6 +105,9 @@ public class LASemanticoUtils {
         return verificarTipo(escopo, ctx.tipo_variavel());
     }
 
+    // Verifica tipo de variável.
+    // caso a variável não foi declarada,
+    // adiciona na tabela de simbolos.
     public static TipoDeclaracao verificarTipo
     (
         Escopo escopo,
@@ -129,6 +136,7 @@ public class LASemanticoUtils {
         return tipo;
     }
 
+    // Verifica se existe o identificador.
     public static Boolean existeIdentificador
     (
         IdentificadorContext ctx,
@@ -149,6 +157,7 @@ public class LASemanticoUtils {
         return existeVariavel;
     }
 
+    // Verifica tipo de identificador, varrendo todos os escopos.
     public static TipoDeclaracao getTipoDeTodosEscopos
     (
         Escopo escopo,
@@ -166,6 +175,7 @@ public class LASemanticoUtils {
         return TipoDeclaracao.INVALIDO;
     }
 
+    // Verifica tipo de parcela unária.
     public static TipoDeclaracao verificarTipo
     (
         Parcela_unarioContext ctx,
@@ -189,9 +199,14 @@ public class LASemanticoUtils {
             return TipoDeclaracao.REAL;
         }
 
+        if (ctx.exp_unica != null){
+            return verificarTipo(ctx.exp_unica, escopo);
+        }
+
         return TipoDeclaracao.INVALIDO;
     }
 
+    // Verifica tipo de termo lógico.
     public static TipoDeclaracao verificarTipo
     (
         Termo_logicoContext ctx,
@@ -213,6 +228,7 @@ public class LASemanticoUtils {
         return tipoAlvo;
     }
 
+    // Verifica tipo de expressão.
     public static TipoDeclaracao verificarTipo
     (
         ExpressaoContext ctx,
@@ -234,6 +250,7 @@ public class LASemanticoUtils {
         return tipoAlvo;
     }
 
+    // Verifica tipo de fator lógico.
     public static TipoDeclaracao verificarTipo
     (
         Fator_logicoContext ctx,
@@ -247,6 +264,7 @@ public class LASemanticoUtils {
         return TipoDeclaracao.INVALIDO;
     }
 
+    // Verifica tipo de parcela lógica.
     public static TipoDeclaracao verificarTipo
     (
         Parcela_logicaContext ctx,
@@ -260,6 +278,7 @@ public class LASemanticoUtils {
         return LASemanticoUtils.verificarTipo(ctx.exp_relacional(), escopo);   
     }
 
+    // Verifica tipo de expressão relacional.
     public static TipoDeclaracao verificarTipo
     (
         Exp_relacionalContext ctx,
@@ -281,6 +300,7 @@ public class LASemanticoUtils {
         return tipoAlvo;
     }
 
+    // Verifica tipo de expressão aritmética.
     public static TipoDeclaracao verificarTipo
     (
         Exp_aritmeticaContext ctx,
@@ -288,15 +308,11 @@ public class LASemanticoUtils {
     )
     {
         TipoDeclaracao tipoAlvo = verificarTipo(ctx.termo(0), escopo);
-        LASemanticoUtils.adicionarErroSemantico(ctx.start, ctx.termo(0).getText() + tipoAlvo.name());
-
 
         if (tipoAlvo != TipoDeclaracao.INVALIDO){
             for (TermoContext termo : ctx.termo()) {
                 TipoDeclaracao tipoTestado = verificarTipo(termo, escopo);
     
-                LASemanticoUtils.adicionarErroSemantico(ctx.start, termo.getText() + tipoTestado.name());
-
                 if (tipoTestado != tipoAlvo){
                     return TipoDeclaracao.INVALIDO;
                 }
@@ -306,6 +322,7 @@ public class LASemanticoUtils {
         return tipoAlvo;
     }
 
+    // Verifica tipo do termo, operações de + e -.
     public static TipoDeclaracao verificarTipo
     (
         TermoContext ctx,
@@ -313,13 +330,10 @@ public class LASemanticoUtils {
     )
     {
         TipoDeclaracao tipoAlvo = verificarTipo(ctx.fator(0), escopo);
-        LASemanticoUtils.adicionarErroSemantico(ctx.start, ctx.fator(0).getText() + tipoAlvo.name());
-        
+
         if (tipoAlvo != TipoDeclaracao.INVALIDO){
             for (FatorContext fator : ctx.fator()) {
                 TipoDeclaracao tipoTestado = verificarTipo(fator, escopo);
-                
-                LASemanticoUtils.adicionarErroSemantico(ctx.start, fator.getText() + tipoTestado.name());
     
                 if (tipoTestado != tipoAlvo){
                     return TipoDeclaracao.INVALIDO;
@@ -330,6 +344,7 @@ public class LASemanticoUtils {
         return tipoAlvo;
     }
 
+    // Verifica tipo do fator, operações de * e /.
     public static TipoDeclaracao verificarTipo
     (
         FatorContext ctx,
@@ -351,6 +366,7 @@ public class LASemanticoUtils {
         return tipoAlvo;
     }
 
+    // Verifica tipo de parcela, operações de %.
     public static TipoDeclaracao verificarTipo
     (
         ParcelaContext ctx,
@@ -367,6 +383,7 @@ public class LASemanticoUtils {
         return TipoDeclaracao.INVALIDO;
     }
 
+    // Verifica tipo de parcela não unária.
     public static TipoDeclaracao verificarTipo
     (
         Parcela_nao_unarioContext ctx,
@@ -380,6 +397,7 @@ public class LASemanticoUtils {
         return TipoDeclaracao.INVALIDO;
     }
 
+    // Verifica tipo de acordo com o identificador.
     public static TipoDeclaracao verificarTipo
     (
         IdentificadorContext ctx,

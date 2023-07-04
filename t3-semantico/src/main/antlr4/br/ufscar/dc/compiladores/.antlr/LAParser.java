@@ -2489,19 +2489,22 @@ public class LAParser extends Parser {
 	}
 
 	public static class Parcela_unarioContext extends ParserRuleContext {
+		public ExpressaoContext expressao;
+		public List<ExpressaoContext> pars = new ArrayList<ExpressaoContext>();
+		public ExpressaoContext exp_unica;
 		public IdentificadorContext identificador() {
 			return getRuleContext(IdentificadorContext.class,0);
 		}
 		public TerminalNode PONTEIRO() { return getToken(LAParser.PONTEIRO, 0); }
 		public TerminalNode IDENT() { return getToken(LAParser.IDENT, 0); }
 		public TerminalNode ABREPAR() { return getToken(LAParser.ABREPAR, 0); }
+		public TerminalNode FECHAPAR() { return getToken(LAParser.FECHAPAR, 0); }
 		public List<ExpressaoContext> expressao() {
 			return getRuleContexts(ExpressaoContext.class);
 		}
 		public ExpressaoContext expressao(int i) {
 			return getRuleContext(ExpressaoContext.class,i);
 		}
-		public TerminalNode FECHAPAR() { return getToken(LAParser.FECHAPAR, 0); }
 		public List<TerminalNode> VIRGULA() { return getTokens(LAParser.VIRGULA); }
 		public TerminalNode VIRGULA(int i) {
 			return getToken(LAParser.VIRGULA, i);
@@ -2547,7 +2550,8 @@ public class LAParser extends Parser {
 				setState(467);
 				match(ABREPAR);
 				setState(468);
-				expressao();
+				((Parcela_unarioContext)_localctx).expressao = expressao();
+				((Parcela_unarioContext)_localctx).pars.add(((Parcela_unarioContext)_localctx).expressao);
 				setState(473);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -2557,7 +2561,8 @@ public class LAParser extends Parser {
 					setState(469);
 					match(VIRGULA);
 					setState(470);
-					expressao();
+					((Parcela_unarioContext)_localctx).expressao = expressao();
+					((Parcela_unarioContext)_localctx).pars.add(((Parcela_unarioContext)_localctx).expressao);
 					}
 					}
 					setState(475);
@@ -2588,7 +2593,7 @@ public class LAParser extends Parser {
 				setState(480);
 				match(ABREPAR);
 				setState(481);
-				expressao();
+				((Parcela_unarioContext)_localctx).exp_unica = expressao();
 				setState(482);
 				match(FECHAPAR);
 				}

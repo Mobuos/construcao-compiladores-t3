@@ -277,10 +277,10 @@ parcela
     ;
 parcela_unario
     : '^'? identificador
-	| IDENT '(' expressao (',' expressao)* ')'
+	| IDENT '(' pars+=expressao (',' pars+=expressao)* ')'
 	| NUM_INT
 	| NUM_REAL
-	| '(' expressao ')'
+	| '(' exp_unica=expressao ')'
     ;
 
 // Regra de definição de recuperação do valor de um endereço da variável.
