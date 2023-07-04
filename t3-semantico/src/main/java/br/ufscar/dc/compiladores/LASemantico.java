@@ -1,11 +1,11 @@
 package br.ufscar.dc.compiladores;
 
-import java.util.LinkedList;
-
+import br.ufscar.dc.compiladores.LAParser.CmdAtribuicaoContext;
 import br.ufscar.dc.compiladores.LAParser.Declaracao_funcoesContext;
 import br.ufscar.dc.compiladores.LAParser.Declaracao_variaveisContext;
 import br.ufscar.dc.compiladores.LAParser.DeclaracoesContext;
 import br.ufscar.dc.compiladores.LAParser.IdentificadorContext;
+import br.ufscar.dc.compiladores.TabelaDeSimbolos.TipoDeclaracao;
 
 public class LASemantico extends LABaseVisitor<Void> {
 
@@ -59,12 +59,11 @@ public class LASemantico extends LABaseVisitor<Void> {
         if (ctx.DECLARE() != null){
             String nome = ctx.DECLARE().getText();
 
-            // TODO: Colocar erro que já exista a variável.
             if (tabela.existe(nome)){
                 System.out.println("Variavel " + nome + "ja esta declarada");
             }
             else{
-                LASemanticoUtils.verificarTipo(tabela, ctx.variavel());
+                LASemanticoUtils.verificarTipo(escopo, ctx.variavel());
             }
         }
         return super.visitDeclaracao_variaveis(ctx);
@@ -76,21 +75,46 @@ public class LASemantico extends LABaseVisitor<Void> {
         IdentificadorContext ctx
     ) 
     {
-        LinkedList<TabelaDeSimbolos> tabelas = escopo.recuperarTodosEscopos();
+        Boolean existeIdentificador = LASemanticoUtils.existeIdentificador(ctx, escopo);
         String nome = ctx.IDENT().get(0).getText();
-        boolean existeVariavel = false;
 
-        for ( TabelaDeSimbolos tabela: tabelas){
-            if (tabela.existe(nome)){
-                existeVariavel = true;
-                break;
-            }
-        }
-
-        if (!existeVariavel){
+        if (!existeIdentificador){
             LASemanticoUtils.adicionarErroSemantico(ctx.start, "identificador " + nome + " nao declarado" );
         }
 
         return super.visitIdentificador(ctx);
+    }
+
+    @Override
+    public Void visitCmdAtribuicao
+    (
+        CmdAtribuicaoContext ctx
+    ) 
+    {
+        if (LASemanticoUtils.existeIdentificador(ctx.identificador(), escopo)){
+            String nome = ctx.identificador().IDENT(0).getText();
+            TipoDeclaracao tipoAlvo = LASemanticoUtils.getTipoDeTodosEscopos(escopo, nome);
+
+            if (ctx.PONTEIRO() != null){
+                tipoAlvo = TipoDeclaracao.PONTEIRO;
+            }
+
+            if (tipoAlvo == TipoDeclaracao.INVALIDO){
+                LASemanticoUtils.adicionarErroSemantico(ctx.start, "identificador " + nome + " com tipo invalido");
+            }
+            else {
+                TipoDeclaracao tipoExpressao = LASemanticoUtils.verificarTipo(ctx.expressao(), escopo);
+
+                if (tipoExpressao == TipoDeclaracao.INVALIDO || tipoAlvo != tipoExpressao){
+                    LASemanticoUtils.adicionarErroSemantico(
+                        ctx.start,
+                        "atribuicao nao compativel para " + ctx.identificador().IDENT(0).getText()
+                    );
+                }
+            }
+
+        }
+
+        return super.visitCmdAtribuicao(ctx);
     }
 }
