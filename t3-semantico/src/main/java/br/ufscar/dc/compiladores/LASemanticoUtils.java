@@ -26,6 +26,7 @@ import br.ufscar.dc.compiladores.TabelaDeSimbolos.TipoDeclaracao;
 public class LASemanticoUtils {
     public static List<String> errosSemanticos = new ArrayList<>();
     
+    // Função auxiliar para adicionar erros semânticos.
     public static void adicionarErroSemantico
     (
         Token t,
@@ -34,6 +35,33 @@ public class LASemanticoUtils {
     {
         int linha = t.getLine();
         errosSemanticos.add(String.format("Linha %d: %s", linha, mensagem));
+    }
+
+    // Função auxiliar para comparar tipos
+    public static Boolean tiposCompativeis
+    (
+        TipoDeclaracao tipo1,
+        TipoDeclaracao tipo2
+    )
+    {
+        if (tipo1 == tipo2){
+            return true;
+        }
+        else if (
+                (
+                    tipo1 == TipoDeclaracao.REAL 
+                    && tipo2 == TipoDeclaracao.INTEIRO
+                )
+                || 
+                (
+                    tipo1 == TipoDeclaracao.INTEIRO 
+                    && tipo2 == TipoDeclaracao.REAL
+                ) 
+            ){
+            return true;
+        }
+
+        return false;
     }
 
     // Verifica tipo básico.
@@ -199,6 +227,10 @@ public class LASemanticoUtils {
             return TipoDeclaracao.REAL;
         }
 
+        if (ctx.CADEIA() != null){
+            return TipoDeclaracao.LITERAL;
+        }
+
         if (ctx.exp_unica != null){
             return verificarTipo(ctx.exp_unica, escopo);
         }
@@ -219,7 +251,7 @@ public class LASemanticoUtils {
             for (Fator_logicoContext fator_logico : ctx.fator_logico()) {
                 TipoDeclaracao tipoTestado = verificarTipo(fator_logico, escopo);
     
-                if (tipoTestado != tipoAlvo){
+                if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
             }
@@ -241,7 +273,7 @@ public class LASemanticoUtils {
             for (Termo_logicoContext termo_logico : ctx.termo_logico()) {
                 TipoDeclaracao tipoTestado = verificarTipo(termo_logico, escopo);
     
-                if (tipoTestado != tipoAlvo){
+                if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
             }
@@ -291,7 +323,7 @@ public class LASemanticoUtils {
             for (Exp_aritmeticaContext exp_aritmetica : ctx.exp_aritmetica()) {
                 TipoDeclaracao tipoTestado = verificarTipo(exp_aritmetica, escopo);
     
-                if (tipoTestado != tipoAlvo){
+                if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
             }
@@ -313,7 +345,7 @@ public class LASemanticoUtils {
             for (TermoContext termo : ctx.termo()) {
                 TipoDeclaracao tipoTestado = verificarTipo(termo, escopo);
     
-                if (tipoTestado != tipoAlvo){
+                if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
             }
@@ -330,12 +362,12 @@ public class LASemanticoUtils {
     )
     {
         TipoDeclaracao tipoAlvo = verificarTipo(ctx.fator(0), escopo);
-
+        
         if (tipoAlvo != TipoDeclaracao.INVALIDO){
             for (FatorContext fator : ctx.fator()) {
                 TipoDeclaracao tipoTestado = verificarTipo(fator, escopo);
     
-                if (tipoTestado != tipoAlvo){
+                if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
             }
@@ -357,7 +389,7 @@ public class LASemanticoUtils {
             for (ParcelaContext parcela : ctx.parcela()) {
                 TipoDeclaracao tipoTestado = verificarTipo(parcela, escopo);
     
-                if (tipoTestado != tipoAlvo){
+                if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
             }

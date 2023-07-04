@@ -280,6 +280,7 @@ parcela_unario
 	| IDENT '(' pars+=expressao (',' pars+=expressao)* ')'
 	| NUM_INT
 	| NUM_REAL
+    | CADEIA
 	| '(' exp_unica=expressao ')'
     ;
 
