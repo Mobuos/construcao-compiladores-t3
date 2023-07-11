@@ -105,7 +105,10 @@ public class LASemantico extends LABaseVisitor<Void> {
             else {
                 TipoDeclaracao tipoExpressao = LASemanticoUtils.verificarTipo(ctx.expressao(), escopo);
 
-                if (tipoExpressao == TipoDeclaracao.INVALIDO || tipoAlvo != tipoExpressao){
+                if (
+                    tipoExpressao == TipoDeclaracao.INVALIDO || 
+                    !LASemanticoUtils.tiposCompativeis(tipoExpressao, tipoAlvo)
+                ){
                     LASemanticoUtils.adicionarErroSemantico(
                         ctx.start,
                         "atribuicao nao compativel para " + ctx.identificador().IDENT(0).getText()

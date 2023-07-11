@@ -148,7 +148,7 @@ public class LASemanticoUtils {
         ctx.identificador().forEach(ident -> {
             if (tabela.existe(ident.getText())){
                 adicionarErroSemantico(
-                    ctx.tipo().start,
+                    ident.start,
                     "identificador " + ident.getText() + " ja declarado anteriormente"
                     );
             }
@@ -255,6 +255,11 @@ public class LASemanticoUtils {
                     return TipoDeclaracao.INVALIDO;
                 }
             }
+            // Se existe um operador lógico, e todos os valores dos termos lógicos
+            // são compatíveis, retorna tipo valor como LÓGICO.
+            if (ctx.op_logico_2().size() > 0){
+                return TipoDeclaracao.LOGICO;
+            }
         }
 
         return tipoAlvo;
@@ -276,6 +281,12 @@ public class LASemanticoUtils {
                 if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
+            }
+
+            // Se existe um operador lógico, e todos os valores dos termos lógicos
+            // são compatíveis, retorna tipo valor como LÓGICO.
+            if (ctx.op_logico_1().size() > 0){
+                return TipoDeclaracao.LOGICO;
             }
         }
         
@@ -326,6 +337,12 @@ public class LASemanticoUtils {
                 if (!tiposCompativeis(tipoTestado, tipoAlvo)){
                     return TipoDeclaracao.INVALIDO;
                 }
+            }
+            
+            // Se existe um operador relaciona, e todos os valores dos termos lógicos
+            // são compatíveis, retorna tipo valor como LÓGICO.
+            if (ctx.op_relacional() != null){
+                return TipoDeclaracao.LOGICO;
             }
         }
 
